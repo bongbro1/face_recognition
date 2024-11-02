@@ -1,7 +1,7 @@
 # Requirements
 
 Dưới đây là danh sách các thư viện Python cần thiết cho dự án. Hãy coppy nội dung sau vào file :
-# requirements.txt
+### requirements.txt
 
 - `absl-py==2.1.0`
 - `aiohttp==3.10.10`
