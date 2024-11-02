@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm người dùng</title>
+    <link rel="shortcut icon" href="/static/img/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1 class="title_web">Thêm thông tin</h1>
+    <div class="container_form">
+        <form id="addUserForm" enctype="multipart/form-data">
+            <label for="name">Tên:</label>
+            <input type="text" id="name" name="name" required><br><br>
+    
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+    
+            <label for="face_encoding">Chụp Ảnh:</label>
+            <div class="row_flex">
+                <video id="webcam" autoplay style="transform: scaleX(-1);"></video>
+                <div>
+                    <button type="button" id="captureBtn">Chụp Ảnh</button>
+                    <p id="notification" style="margin: 20px 0 0 24px"></p>
+                </div>
+            </div>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <input type="hidden" id="face_encoding" name="face_encoding"><br><br>
+            <h3>Ảnh đã chụp:</h3>
+            <div id="capturedImagesContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div> <!-- Khung để hiển thị ảnh -->
+
+            <div class="align_right">
+                <button class="btn_back" onclick="window.location.href='/'">Quay lại</button>
+                <button type="submit">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="container_load" style="display: flex; flex-direction: column;">
+        <div id="loader" class="loader"></div>
+        <p class="load_text">Loading...</p>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Bắt đầu webcam
+            const video = document.getElementById('webcam');
+            let captureInterval;
+            let capturedImages = [];
+            let captureCount = 0; // Biến để đếm số lượng ảnh đã chụp
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => console.error('Error accessing webcam: ', err));
+
+            $('#captureBtn').on('mousedown', function() {
+                // Bắt đầu chụp ảnh liên tục
+                $('#notification').text('Đang chụp ảnh...'); // Hiển thị thông báo
+                captureInterval = setInterval(captureImage, 50);
+            });
+
+            $('#captureBtn').on('mouseup mouseleave', function() {
+                clearInterval(captureInterval);
+                $('#notification').text(`Chụp ảnh dừng lại! Đã chụp ${captureCount} ảnh.`);
+
+                // Gán tất cả các ảnh đã chụp vào trường hidden
+                $('#face_encoding').val(JSON.stringify(capturedImages));
+            });
+
+            function captureImage() {
+                const canvas = $('#canvas')[0];
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Lấy dữ liệu ảnh dưới dạng base64
+                const faceEncoding = canvas.toDataURL('image/jpeg', 1);
+                capturedImages.push(faceEncoding);
+                captureCount++;
+
+                $('#notification').text(`Đã chụp ${captureCount} ảnh!`);
+
+                // Hiển thị ảnh đã chụp trong khung
+                displayCapturedImage(faceEncoding);
+            }
+
+            function displayCapturedImage(imageData) {
+                const container = $('#capturedImagesContainer');
+                const imgElement = $('<img>').attr('src', imageData).css({
+                    width: '100px',
+                    height: 'auto',
+                    border: '1px solid #ccc',
+                    borderRadius: '5px'
+                });
+                container.prepend(imgElement);
+            }
+
+            // Gửi dữ liệu form về server khi submit
+            $('#addUserForm').on('submit', function(event) {
+                event.preventDefault(); // Ngăn chặn hành động mặc định của form
+                showLoader();
+                const formData = new FormData(this);
+                if (capturedImages.length <= 50) {
+                    alert('Vui lòng chụp thêm ảnh')
+                    window.location.href = '/add_user'
+                }
+
+                $.ajax({
+                    url: '/add_user',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        alert(response.message);
+                        hideLoader();
+                        window.location.href = '/';
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                        hideLoader(); // Đảm bảo ẩn loader khi có lỗi
+                    }
+                });
+            });
+
+            function showLoader() {
+                $(".container_load").addClass("active");
+                $(".container_form").hide();
+            }
+
+            // Ẩn preloader khi quá trình kết thúc
+            function hideLoader() {
+                $(".container_load").removeClass("active");
+                $(".container_form").show();
+            }
+        });
+    </script>
+</body>
+</html>
