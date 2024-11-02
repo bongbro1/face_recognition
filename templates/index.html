@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống điểm danh thông qua khuôn mặt</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="shortcut icon" href="/static/img/logo.png" type="image/x-icon">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="/static/script.js"></script>
+</head>
+
+<body>
+    <h1 class="title_web">Hệ thống điểm danh thông qua khuôn mặt</h1>
+    <div class="container">
+        <div>
+            <div class="left_content">
+                <video id="webcam" class="flip-horizontal" autoplay></video>
+                <div class="row">
+                    <button id="recordBtn">Start Recording</button>
+                    <button id="stopRecordBtn" disabled>Stop Recording</button>
+                    <button id="flipHorizontalBtn">Flip Horizontal</button>
+                </div>
+                <div class="row">
+                    <button id="addUserBtn" onclick="window.location.href='/add_user'">Add user</button>
+                    <button id="btn_train_model">Train model</button>
+                </div>
+                <div id="predictionResult" class="predictionResult">
+                    <h2>Kết quả dự đoán: <span id="resultText">Không xác định</span></h2>
+                    <h2>Xác suất dự đoán đúng: <span id="result_percentText">100%</span></h2>
+                </div>
+                
+            </div>
+        </div>
+        <div class="notification-box" id="notificationBox">
+            <h2>Thông báo</h2>
+            <div id="notificationMessage" class="notificationMessage">
+                <div class="header">
+                    <p>Mã NV</p>
+                    <p>Tên</p>
+                    <p>Giờ vào</p>
+                    <p>Tỉ lệ dự đoán</p>
+                </div>
+                <div id="list_user_attendance" class="list_user_attendance"></div>
+                <p class="system_status">Số lượng đối tượng: <span class="count_object">0</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="container_load" style="display: flex; flex-direction: column;">
+        <div id="loader" class="loader"></div>
+        <p id="load_text" class="load_text">Loading ...</p>
+        <progress id="progress_bar" value="0" max="100" style="width: 100%; height: 30px;"></progress>
+    </div>
+
+</body>
+
+</html>
