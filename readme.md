@@ -1,4 +1,4 @@
-# Requirements
+## Hướng dẫn cài đặt
 
 Dưới đây là danh sách các thư viện Python cần thiết cho dự án. Hãy coppy nội dung sau vào file :
 ### requirements.txt
@@ -18,7 +18,7 @@ Dưới đây là danh sách các thư viện Python cần thiết cho dự án.
 - `tensorflow==2.17.1`
 - `Werkzeug==3.0.4`
 
-## Cài đặt
+### Cài đặt
 
 Để cài đặt tất cả các thư viện này, hãy chạy lệnh sau trong terminal của bạn:
 
